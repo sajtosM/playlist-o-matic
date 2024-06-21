@@ -1,7 +1,8 @@
 import { read, readFileSync } from "fs";
 
-async function main() {
-    const results = JSON.parse(readFileSync("data/watchlistCategory.json", "utf-8"));
+async function main(file:string) {
+
+    const results = JSON.parse(readFileSync(file, "utf-8"));
     const categoryList = {};
     for (const result of results) {
         const category = result.category;
@@ -19,9 +20,11 @@ async function main() {
         console.log("| Title | Url |");
         console.log("| --- | --- |");
         for (const video of element) {
-            console.log(`| [${video.title.replaceAll('|','')}](${video.url}) | ${video.url} |`);
+            console.log(`| [${video.title.replaceAll('|','')}](${video.link}) | ${video.link} |`);
         }
     }
 }
 
-main();
+const file = process.argv[2] || "data/watchlistCategory.json";
+
+main(file);

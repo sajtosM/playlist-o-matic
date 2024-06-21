@@ -10,12 +10,13 @@ import { ChatOllama } from "@langchain/community/chat_models/ollama";
 dotenv.config();
 
 
-async function main() {
+async function main(categoryListPath: string) {
 
 
-    const categories: string[] = readFileSync("data/categories.txt", "utf-8")
+    const categories: string[] = readFileSync(categoryListPath, "utf-8")
         .split('\n')
         .filter(x => !x.includes('🎥Hold Projektek'))
+        .filter(x => !x.includes('🏭Munka'))
         .map(x => {if(x.includes('Történelem')) {return 'HISTORY'} else {return x}})
         .join('\n')
         .replaceAll('./01 - Projects/', '')
@@ -47,7 +48,7 @@ async function main() {
     }
     console.table(categories);
 
-
+    writeFileSync("data/categoriesFiltered.txt", categories.join('\n'));
 
 
     const taggingPrompt = ChatPromptTemplate.fromTemplate(
@@ -106,7 +107,7 @@ async function main() {
             console.log(result);
             results.push({
                 title: video.title,
-                url: video.link,
+                link: video.link,
                 category: result.sentiment,
                 id: video.id,
                 language: result.language,
@@ -120,4 +121,6 @@ async function main() {
 
 }
 
-main();
+const categoryListPath = process.argv[2] || "data/categories.txt";
+
+main(categoryListPath);
