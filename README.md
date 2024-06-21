@@ -18,6 +18,12 @@ cd playlist-o-matic
 npm install
 ```
 
+Create a dotenv file in the project directory with the following content:
+
+```sh
+OPENAI_API_KEY="<openai-api-key>"
+```
+
 ## Usage
 
 Download your watchlist by executing the following command in your browser while on the YouTube watchlist page:
