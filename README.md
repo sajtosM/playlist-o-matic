@@ -1,6 +1,6 @@
 # Playlist-o-matic
 
-Playlist-o-matic is a tool designed to automate the creation and categorization of YouTube playlists. It uses AI models to summarize YouTube videos and categorize them based on their content (well title at the moment).
+Playlist-o-matic is a tool designed to automate the creation and categorization of YouTube playlists. It uses AI models to summarize YouTube videos and categorize them based on their content (title at the moment).
 
 ## Features
 
