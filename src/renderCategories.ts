@@ -1,8 +1,8 @@
-import { read, readFileSync } from "fs";
+import { writeFileSync } from "fs";
 
-async function main(file:string) {
+export async function renderCategories(watchlist: any, fileName?: string) {
 
-    const results = JSON.parse(readFileSync(file, "utf-8"));
+    let results = watchlist;
     const categoryList = {};
     for (const result of results) {
         const category = result.category;
@@ -11,20 +11,24 @@ async function main(file:string) {
         }
         categoryList[category].push(result);
     }
+    console.log('Creating markdown file');
+    let fileContent = `File generated at ${new Date().toISOString()}\n\n`;
 
     // write out as markdown
     for (let i = 0; i < Object.keys(categoryList).length; i++) {
         const element = categoryList[Object.keys(categoryList)[i]];
-        console.log(`## ${Object.keys(categoryList)[i]}`);
+        fileContent += `## ${Object.keys(categoryList)[i]}\n`
 
-        console.log("| Title | Url |");
-        console.log("| --- | --- |");
+        fileContent += "| Title | Url |\n";
+        fileContent += "| --- | --- |\n";
         for (const video of element) {
-            console.log(`| [${video.title.replaceAll('|','')}](${video.link}) | ${video.link} |`);
+            fileContent += `| [${video.title.replaceAll('|', '')}](${video.link}) | ${video.link} |\n`;
         }
     }
+    if (fileName) {
+        fileName = "watchlistCategory.md";
+    }
+    console.log('Writing file:' + 'data/' + fileName);
+    writeFileSync('data/' + fileName, fileContent, "utf-8");
+    console.log('File written');
 }
-
-const file = process.argv[2] || "data/watchlistCategory.json";
-
-main(file);

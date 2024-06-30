@@ -1,14 +1,15 @@
 import { PromptTemplate } from "@langchain/core/prompts";
 import dotenv from "dotenv";
 import { loadSummarizationChain } from "langchain/chains";
-import { ChatOpenAI } from "langchain/chat_models/openai";
-import { ChatOllama } from "langchain/chat_models/ollama";
 import { YoutubeLoader } from "langchain/document_loaders/web/youtube";
 import { TokenTextSplitter } from "langchain/text_splitter";
 import readline from "readline";
 import { ChatMistralAI } from "@langchain/mistralai";
+import { ChatOpenAI } from "@langchain/openai";
+import { ChatOllama } from "@langchain/community/chat_models/ollama";
 
 export const getYoutubeInfo = async function (youtubeUrl: string) {
+  // FIXME: youtube loader is deprecated, find a new way to load youtube info
   try {
     const loader = YoutubeLoader.createFromUrl(youtubeUrl, {
       language: "en",
@@ -51,10 +52,10 @@ export const getYoutubeSummary = async function (
   const docsSummary = await splitter.splitDocuments(docs);
 
   let llmSummary;
-  if (model === "gpt-4-turbo-preview" || model === "gpt-4") {
+  if (model.includes("gpt-4")) {
     llmSummary = new ChatOpenAI({
       temperature: 0.3,
-      modelName: "gpt-4-turbo-preview",
+      modelName: model,
     });
   } else if (model === "mistral-small") {
     llmSummary = new ChatMistralAI({
@@ -64,7 +65,7 @@ export const getYoutubeSummary = async function (
   } else {
     // TODO: use an instruct mode and output JSON
     llmSummary = new ChatOllama({
-      model: "mistral",
+      model: model,
       temperature: 0.1,
     });
   }

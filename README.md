@@ -4,9 +4,9 @@ Playlist-o-matic is a tool designed to automate the creation and categorization 
 
 ## Features
 
-- Summarizes YouTube videos using AI models from Langchain, MistralAI, and OpenAI. (Coming soon)
-- Categorizes videos and creates playlists based on their content.
-- Provides a command-line interface for easy use.
+- Categorizes videos and creates playlists based on their content (content getter not working ATM) and title.
+- Renders the playlist as markdown files for easy reading.
+- (BROKEN) Uses the subtitle of the video to summarize the videos and use that as a basis for categorization.
 
 ## Installation
 
@@ -39,14 +39,29 @@ console.log(videoList);
 console.log(JSON.stringify(videoList));
 ```
 
-Paste the json array into a file called `WL.json` in the `data/` folder in the project directory. Then, run the following command to create and categorize playlists:
+Paste the json array into a file called `WL.json` in the `data/` folder in the project directory. 
 
-```sh
-ts-node src/createCategories.ts
+Create a file called `categoryList.txt` in the project directory with a list of categories separated by newlines. For example, the file could look like this:
+
+```txt
+🎮Gaming
+🎵Music
+🎨Art
+📚Education
 ```
 
-You can then render your playlists by running the following command:
+Run the following command to create and categorize playlists:
 
 ```sh
-ts-node src/renderCategories.ts > data/categoryList.md
+ts-node src/index.ts data/categoryList.txt data/WL.json
+# OR
+npm start src/index.ts data/categoryList.txt data/WL.json
+```
+
+### Rendering separate playlists jsons
+
+You can then render a playlist by running the following command:
+
+```sh
+ts-node ts-node src/writeCatFile.ts "data/watchlistCategory.json"
 ```

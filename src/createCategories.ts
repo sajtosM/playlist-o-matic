@@ -10,7 +10,7 @@ import { ChatOllama } from "@langchain/community/chat_models/ollama";
 dotenv.config();
 
 
-async function main(categoryListPath: string) {
+export async function createCategories(categoryListPath: string, watchlistPath: string) {
 
 
     const categories: string[] = readFileSync(categoryListPath, "utf-8")
@@ -79,6 +79,8 @@ async function main(categoryListPath: string) {
     //     apiKey: process.env.MISTRAL_API_KEY,
     //     modelName: "mistral-small",
     // });
+
+    // TODO: add a posibliity to use ollama for cheeper running costs OR use other model than gpt-4o
     const llm = new ChatOpenAI({
         temperature: 0,
         modelName: "gpt-4o",
@@ -93,7 +95,7 @@ async function main(categoryListPath: string) {
 
 
 
-    const watchlist = JSON.parse(readFileSync("data/WL.json", "utf-8"));
+    const watchlist = JSON.parse(readFileSync(watchlistPath, "utf-8"));
     console.table(watchlist.map(x => x.title));
 
     const results = [];
@@ -101,7 +103,7 @@ async function main(categoryListPath: string) {
 
     for (const video of watchlist) {
         try {            
-            const input = video.title;
+            const input = `${video.title} by ${video.channelName}`;
             console.log(input);
             const result:any = await taggingChain.invoke({ input });
             console.log(result);
@@ -111,6 +113,8 @@ async function main(categoryListPath: string) {
                 category: result.sentiment,
                 id: video.id,
                 language: result.language,
+                channelName: video.channelName,
+                numberOfViews: video.numberOfViews,
             })
         } catch (error) {
             debugger
@@ -118,9 +122,5 @@ async function main(categoryListPath: string) {
     }
 
     writeFileSync("data/watchlistCategory.json", JSON.stringify(results, null, 2));
-
+    return results;
 }
-
-const categoryListPath = process.argv[2] || "data/categories.txt";
-
-main(categoryListPath);
