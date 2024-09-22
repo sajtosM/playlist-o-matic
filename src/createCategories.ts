@@ -83,7 +83,7 @@ export async function createCategories(categoryListPath: string, watchlistPath: 
     // TODO: add a posibliity to use ollama for cheeper running costs OR use other model than gpt-4o
     const llm = new ChatOpenAI({
         temperature: 0,
-        modelName: "gpt-4o",
+        modelName: "gpt-4o-mini",
     });
 
     // Name is optional, but gives the models more clues as to what your schema represents

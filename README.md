@@ -63,5 +63,5 @@ npm start src/index.ts data/categoryList.txt data/WL.json
 You can then render a playlist by running the following command:
 
 ```sh
-ts-node ts-node src/writeCatFile.ts "data/watchlistCategory.json"
+ts-node src/writeCatFile.ts "data/watchlistCategory.json"
 ```
