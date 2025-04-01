@@ -1,23 +1,21 @@
 import { readFileSync, writeFileSync } from "fs";
 
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { ChatOpenAI } from "@langchain/openai";
 import { z } from "zod";
-import { ChatMistralAI } from "@langchain/mistralai";
+import { ChatOpenAI } from "@langchain/openai";
 import * as dotenv from 'dotenv';
-import { ChatOllama } from "@langchain/community/chat_models/ollama";
+import { ChatOllama } from "@langchain/ollama";
 
 dotenv.config();
 
 
-export async function createCategories(categoryListPath: string, watchlistPath: string) {
-
+export async function createCategories(categoryListPath: string, watchlistPath: string, isOllama: boolean) {
 
     const categories: string[] = readFileSync(categoryListPath, "utf-8")
         .split('\n')
         .filter(x => !x.includes('🎥Hold Projektek'))
         .filter(x => !x.includes('🏭Munka'))
-        .map(x => {if(x.includes('Történelem')) {return 'HISTORY'} else {return x}})
+        // .map(x => {if(x.includes('Történelem')) {return 'HISTORY'} else {return x}})
         .join('\n')
         .replaceAll('./01 - Projects/', '')
         .replaceAll('/🎥Hold Projektek', '')
@@ -40,6 +38,7 @@ export async function createCategories(categoryListPath: string, watchlistPath: 
         .filter(x => !x.includes('🏭'))
         .filter(x => !x.includes('Apple Books'))
         .filter(x => !x.includes('Filmek'))
+        .filter(x => !x.includes('attachments'))
         // .map(x => {if(x.includes('Filmek')) {return 'MEDIA'} else {return x}})
         ;
 
@@ -52,7 +51,7 @@ export async function createCategories(categoryListPath: string, watchlistPath: 
 
 
     const taggingPrompt = ChatPromptTemplate.fromTemplate(
-        `Extract the desired information from the following passage.
+        `Extract the desired information from the following text.
       
       Only extract the properties mentioned in the 'Classification' function.
       
@@ -66,25 +65,24 @@ export async function createCategories(categoryListPath: string, watchlistPath: 
     }
 
     const classificationSchema = z.object({
-        sentiment: z.enum([...categories] as [string, ...string[]]).describe("The category of the youtube video"),
-        language: z.string().describe("The language the video title is written in"),
+        category: z.enum([...categories] as [string, ...string[]]).describe("Best matching category of the youtube video. Try to pick the most relevant one if there are multiple contenders. Dont guess a random one!"),
+        reson: z.string().describe("Describe why you picked this category. Use the text from the video to support your answer."),
     });
-
-    // LLM
-    // const llm : ChatOllama= new ChatOllama({
-    //     model: "llama3",
-    //     temperature: 0.1,
-    // });
-    // const llm = new ChatMistralAI({
-    //     apiKey: process.env.MISTRAL_API_KEY,
-    //     modelName: "mistral-small",
-    // });
 
     // TODO: add a posibliity to use ollama for cheeper running costs OR use other model than gpt-4o
-    const llm = new ChatOpenAI({
-        temperature: 0,
-        modelName: "gpt-4o-mini",
-    });
+    let llm;
+    if (!isOllama) {
+        llm = new ChatOpenAI({
+            // temperature: 0,
+            modelName: "gpt-4o-mini",
+        });
+    } else {
+        llm = new ChatOllama({
+            model: "phi4",
+            temperature: 0,
+        });
+    }
+
 
     // Name is optional, but gives the models more clues as to what your schema represents
     const llmWihStructuredOutput = llm.withStructuredOutput(classificationSchema, {
@@ -102,10 +100,10 @@ export async function createCategories(categoryListPath: string, watchlistPath: 
 
 
     for (const video of watchlist) {
-        try {            
+        try {
             const input = `${video.title} by ${video.channelName}`;
             console.log(input);
-            const result:any = await taggingChain.invoke({ input });
+            const result: any = await taggingChain.invoke({ input });
             console.log(result);
             results.push({
                 title: video.title,

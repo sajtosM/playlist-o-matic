@@ -1,16 +1,15 @@
 # Playlist-o-matic
 
-Playlist-o-matic is a tool designed to automate the creation and categorization of YouTube playlists. It uses AI models to summarize YouTube videos and categorize them based on their content (title at the moment).
+A tool for automatically categorizing YouTube videos from your watchlist into playlists using AI.
 
 ## Features
 
-- Categorizes videos and creates playlists based on their content (content getter not working ATM) and title.
-- Renders the playlist as markdown files for easy reading.
-- (BROKEN) Uses the subtitle of the video to summarize the videos and use that as a basis for categorization.
+- Automatically categorizes YouTube videos based on title content
+- Creates organized playlists from your watchlist
+- Renders playlists as markdown files for easy viewing
+- *(In development)* Video summarization using subtitle content
 
 ## Installation
-
-To install the project, you need to have Node.js installed on your machine. Then, you can clone the repository and install the dependencies:
 
 ```sh
 git clone https://github.com/sajtosM/playlist-o-matic.git
@@ -18,50 +17,82 @@ cd playlist-o-matic
 npm install
 ```
 
-Create a dotenv file in the project directory with the following content:
+Create a `.env` file with your OpenAI API key:
 
 ```sh
-OPENAI_API_KEY="<openai-api-key>"
+OPENAI_API_KEY="your-openai-api-key"
 ```
 
-## Usage
+Alternatively, you can use [Ollama](https://ollama.ai/) for local AI inference by installing it on your machine and adding the `--ollama` flag when running the tool.
 
-Download your watchlist by executing the following command in your browser while on the YouTube watchlist page:
+## How to Use
+
+### 1. Export Your YouTube Watchlist
+
+While on your YouTube watchlist page, run this JavaScript in your browser console:
 
 ```js
-let videoList = Array.from(document.querySelectorAll('#contents ytd-playlist-video-renderer')).map(video => {
-    let title = video.querySelector('#video-title').textContent.trim();
-    let link = video.querySelector('#video-title').href;
-    let id = link.split('v=')[1];
-    return { title, link, id };
-});
-console.log(videoList);
-console.log(JSON.stringify(videoList));
+console.log(
+    JSON.stringify(
+        Array.from(document.querySelectorAll('#contents ytd-playlist-video-renderer'))
+            .map(video => {
+                try {
+                    const title = video.querySelector('#video-title').textContent.trim();
+                    const link = video.querySelector('#video-title').href;
+                    const channelName = video.querySelector('#channel-name').querySelector('.yt-formatted-string').textContent.trim();
+                    const numberOfView = video.querySelector('#video-info').querySelectorAll('.style-scope')[0].textContent.trim();
+                    const whenWasItPosted = video.querySelector('#video-info').querySelectorAll('.style-scope')[2].textContent.trim();
+                    const id = link.split('v=')[1];
+                    return { title, link, id, channelName, numberOfView, whenWasItPosted };
+                } catch (error) {
+
+                }
+            })
+            .filter(video => video)
+    )
+);
 ```
 
-Paste the json array into a file called `WL.json` in the `data/` folder in the project directory. 
+Save the output as `data/WL.json`.
 
-Create a file called `categoryList.txt` in the project directory with a list of categories separated by newlines. For example, the file could look like this:
+### 2. Define Categories
 
-```txt
+Create a file named `data/categoryList.txt` with your desired categories:
+
+```
 🎮Gaming
 🎵Music
 🎨Art
 📚Education
 ```
 
-Run the following command to create and categorize playlists:
+### 3. Generate Categorized Playlists
 
 ```sh
 ts-node src/index.ts data/categoryList.txt data/WL.json
-# OR
+# or
 npm start src/index.ts data/categoryList.txt data/WL.json
 ```
 
-### Rendering separate playlists jsons
+You can also use Ollama models instead of OpenAI for categorization by adding the `--ollama` flag:
 
-You can then render a playlist by running the following command:
+```sh
+ts-node src/index.ts data/categoryList.txt data/WL.json --ollama
+```
+
+This requires having Ollama installed and the phi4 model available locally.
+
+### 4. Render Playlists as Markdown
 
 ```sh
 ts-node src/writeCatFile.ts "data/watchlistCategory.json"
 ```
+
+## Known Issues
+
+- Video content analysis using subtitles is currently not functioning
+- Limited to title-based categorization at the moment
+
+## License
+
+See the [LICENSE](LICENSE) file for details.

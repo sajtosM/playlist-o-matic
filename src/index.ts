@@ -15,7 +15,11 @@ async function main() {
     console.error("Please provide a path to the watchlist file.");
     process.exit(1);
   }
-  const categorizedList = await createCategories(categoryListPath, watchlistPath);
+
+  // Check if the --ollama flag is passed
+  const isOllama = process.argv.includes("--ollama");
+
+  const categorizedList = await createCategories(categoryListPath, watchlistPath, isOllama);
   const fileName = watchlistPath.split("/").pop().replace(".json", ".md");
   renderCategories(categorizedList, fileName);
 
