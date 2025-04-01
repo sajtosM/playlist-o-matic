@@ -4,10 +4,10 @@ A tool for automatically categorizing YouTube videos from your watchlist into pl
 
 ## Features
 
-- Automatically categorizes YouTube videos based on title content
+- Automatically categorizes YouTube videos based on  content
 - Creates organized playlists from your watchlist
 - Renders playlists as markdown files for easy viewing
-- Creates actual YouTube playlists with the categorized videos
+- Create YouTube playlists with the categorized videos
 - *(In development)* Video summarization using subtitle content
 
 ## Installation
