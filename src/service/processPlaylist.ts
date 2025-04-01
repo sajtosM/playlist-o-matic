@@ -1,7 +1,7 @@
 import axios from "axios";
 import * as xml2js from "xml2js";
 import { youtube_v3 } from "googleapis";
-import { getYoutubeSummary } from './youtubeSumm.js';
+import { getYoutubeSummary } from './youtubeSumm';
 
 export async function processPlaylist(playlistId: string): Promise<void> {
   const playlistItems = await getPlaylistItems(playlistId);

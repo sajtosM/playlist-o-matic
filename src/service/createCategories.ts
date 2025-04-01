@@ -1,10 +1,10 @@
 import { readFileSync, writeFileSync } from "fs";
 
-import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { z } from "zod";
 import { ChatOpenAI } from "@langchain/openai";
 import * as dotenv from 'dotenv';
 import { ChatOllama } from "@langchain/ollama";
+import { ChatPromptTemplate } from '@langchain/core/prompts';
 
 dotenv.config();
 
@@ -77,6 +77,7 @@ export async function createCategories(categoryListPath: string, watchlistPath: 
             modelName: "gpt-4o-mini",
         });
     } else {
+        // TODO: make the model selectable in the .env
         llm = new ChatOllama({
             model: "phi4",
             temperature: 0,
@@ -108,14 +109,14 @@ export async function createCategories(categoryListPath: string, watchlistPath: 
             results.push({
                 title: video.title,
                 link: video.link,
-                category: result.sentiment,
+                category: result.category,
                 id: video.id,
                 language: result.language,
                 channelName: video.channelName,
                 numberOfViews: video.numberOfViews,
             })
         } catch (error) {
-            debugger
+            console.error("Error processing video:", video.title, error);
         }
     }
 

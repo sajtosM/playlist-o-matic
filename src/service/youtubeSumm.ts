@@ -1,23 +1,23 @@
 import { PromptTemplate } from "@langchain/core/prompts";
+import { ChatOpenAI } from "@langchain/openai";
 import dotenv from "dotenv";
 import { loadSummarizationChain } from "langchain/chains";
-import { YoutubeLoader } from "langchain/document_loaders/web/youtube";
+// import { YoutubeLoader } from "langchain/document_loaders/web/youtube";
 import { TokenTextSplitter } from "langchain/text_splitter";
 import readline from "readline";
-import { ChatMistralAI } from "@langchain/mistralai";
-import { ChatOpenAI } from "@langchain/openai";
-import { ChatOllama } from "@langchain/community/chat_models/ollama";
+import { ChatOllama } from "@langchain/ollama";
 
 export const getYoutubeInfo = async function (youtubeUrl: string) {
   // FIXME: youtube loader is deprecated, find a new way to load youtube info
   try {
-    const loader = YoutubeLoader.createFromUrl(youtubeUrl, {
-      language: "en",
-      addVideoInfo: true,
-    });
-    const docs = await loader.load();
-    console.log(`Summarizing: [${docs[0].metadata.title}](${youtubeUrl})\n`);
-    return docs;
+    // const loader = YoutubeLoader.createFromUrl(youtubeUrl, {
+    //   language: "en",
+    //   addVideoInfo: true,
+    // });
+    // const docs = await loader.load();
+    // console.log(`Summarizing: [${docs[0].metadata.title}](${youtubeUrl})\n`);
+    // return docs;
+    return null;
   } catch (e) {
     console.error(e);
     debugger;
@@ -58,10 +58,10 @@ export const getYoutubeSummary = async function (
       modelName: model,
     });
   } else if (model === "mistral-small") {
-    llmSummary = new ChatMistralAI({
-      apiKey: process.env.MISTRAL_API_KEY,
-      modelName: "mistral-small",
-    });
+    // llmSummary = new ChatMistralAI({
+    //   apiKey: process.env.MISTRAL_API_KEY,
+    //   modelName: "mistral-small",
+    // });
   } else {
     // TODO: use an instruct mode and output JSON
     llmSummary = new ChatOllama({
@@ -116,8 +116,8 @@ SUMMARY AND INSIGHTS:
   const summarizeChain = loadSummarizationChain(llmSummary, {
     type: "refine",
     verbose: verboseFlag,
-    questionPrompt: SUMMARY_PROMPT,
-    refinePrompt: SUMMARY_REFINE_PROMPT,
+    // questionPrompt: SUMMARY_PROMPT,
+    // refinePrompt: SUMMARY_REFINE_PROMPT,
   });
 
   const summary = await summarizeChain.run(docsSummary);

@@ -2,15 +2,7 @@ import { writeFileSync } from "fs";
 
 export async function renderCategories(watchlist: any, fileName?: string) {
 
-    let results = watchlist;
-    const categoryList = {};
-    for (const result of results) {
-        const category = result.category;
-        if (!categoryList[category]) {
-            categoryList[category] = [];
-        }
-        categoryList[category].push(result);
-    }
+    const categoryList = createCategoryList(watchlist);
     console.log('Creating markdown file');
     let fileContent = `File generated at ${new Date().toISOString()}\n\n`;
 
@@ -31,4 +23,17 @@ export async function renderCategories(watchlist: any, fileName?: string) {
     console.log('Writing file:' + 'data/' + fileName);
     writeFileSync('data/' + fileName, fileContent, "utf-8");
     console.log('File written');
+}
+
+export const createCategoryList = (watchlist: any) => {
+    let results = watchlist;
+    const categoryList = {};
+    for (const result of results) {
+        const category = result.category;
+        if (!categoryList[category]) {
+            categoryList[category] = [];
+        }
+        categoryList[category].push(result);
+    }
+    return categoryList;
 }

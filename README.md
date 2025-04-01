@@ -7,6 +7,7 @@ A tool for automatically categorizing YouTube videos from your watchlist into pl
 - Automatically categorizes YouTube videos based on title content
 - Creates organized playlists from your watchlist
 - Renders playlists as markdown files for easy viewing
+- Creates actual YouTube playlists with the categorized videos
 - *(In development)* Video summarization using subtitle content
 
 ## Installation
@@ -17,10 +18,14 @@ cd playlist-o-matic
 npm install
 ```
 
-Create a `.env` file with your OpenAI API key:
+Create a `.env` file with your OpenAI API key and YouTube API credentials:
 
 ```sh
 OPENAI_API_KEY="your-openai-api-key"
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+REDIRECT_URI="http://localhost:3000/auth/google/callback"
+YOUTUBE_PLAYLIST_PREFIX="[Prefix] " # Optional: Adds a prefix to all created playlist names
 ```
 
 Alternatively, you can use [Ollama](https://ollama.ai/) for local AI inference by installing it on your machine and adding the `--ollama` flag when running the tool.
@@ -69,24 +74,43 @@ Create a file named `data/categoryList.txt` with your desired categories:
 ### 3. Generate Categorized Playlists
 
 ```sh
+# Basic categorization
 ts-node src/index.ts data/categoryList.txt data/WL.json
-# or
-npm start src/index.ts data/categoryList.txt data/WL.json
-```
 
-You can also use Ollama models instead of OpenAI for categorization by adding the `--ollama` flag:
-
-```sh
+# Use Ollama instead of OpenAI for local inference
 ts-node src/index.ts data/categoryList.txt data/WL.json --ollama
+
+# Create actual YouTube playlists with the categorized videos
+ts-node src/index.ts data/categoryList.txt data/WL.json --youtubePlaylist
+
+# Combine flags as needed
+ts-node src/index.ts data/categoryList.txt data/WL.json --ollama --youtubePlaylist
 ```
 
-This requires having Ollama installed and the phi4 model available locally.
+### 4. Render Existing Categorized Lists
 
-### 4. Render Playlists as Markdown
+If you already have a categorized list JSON file, you can render it to markdown without re-categorizing:
 
 ```sh
-ts-node src/writeCatFile.ts "data/watchlistCategory.json"
+ts-node src/index.ts data/watchlistCategory.json --render
 ```
+
+### 5. YouTube Authentication
+
+To use the YouTube API for creating playlists, you'll need to authenticate:
+
+```sh
+# Generate a refresh token for YouTube API
+node -e "require('./dist/service/getRefreshToken').getYouTubeRefreshToken()"
+```
+
+This will guide you through the authentication process and save the refresh token to your .env file.
+
+## Command-line Flags
+
+- `--ollama`: Use Ollama instead of OpenAI for AI inference
+- `--render`: Render an existing categorized list JSON to markdown
+- `--youtubePlaylist`: Create actual YouTube playlists for each category
 
 ## Known Issues
 
