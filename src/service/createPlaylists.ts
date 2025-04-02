@@ -1,6 +1,9 @@
 import { addVideoToPlaylist, createPlaylist, getPlaylists } from "./playListManagement";
 import { createCategoryList } from "./renderCategories";
 
+/**
+ * Creates playlists for each category in the watchlist and adds videos to the playlists.
+ */
 export const createPlaylistsForCategories = async (watchlist: any) => {
 
     const categoryList = createCategoryList(watchlist);
