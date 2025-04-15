@@ -49,37 +49,68 @@ export async function createCategories(categoryListPath: string, watchlistPath: 
 
     writeFileSync("data/categoriesFiltered.txt", categories.join('\n'));
 
+    // Example videos for few-shot learning
+    const exampleVideos = [
+        {
+            input: "How to Build a Gaming PC in 2025 by TechReviews",
+            output: {
+                category: "Technology",
+                reason: "This video is about building computer hardware, which falls under Technology."
+            }
+        },
+        {
+            input: "French Cooking Techniques Every Chef Should Know by FoodMasters",
+            output: {
+                category: "Cooking",
+                reason: "This is a cooking tutorial about French techniques."
+            }
+        }
+    ];
 
     const taggingPrompt = ChatPromptTemplate.fromTemplate(
-        `Extract the desired information from the following text.
-      
-      Only extract the properties mentioned in the 'Classification' function.
-      
-      Passage:
-      {input}
-      `
+        `You are a video categorization assistant. Your task is to assign a single category to a YouTube video.
+
+        VIDEO INFORMATION:
+        Title: {input}
+
+        AVAILABLE CATEGORIES:
+        ${categories.join(', ')}
+
+        EXAMPLES:
+        ${exampleVideos.map(ex => `Input: "${ex.input}"\nOutput:\ncategory: ${ex.output.category}\nreason: ${ex.output.reason}`).join('\n\n')}
+
+        INSTRUCTIONS:
+        1. Read the video title carefully
+        2. Choose exactly ONE category from the list above
+        3. Provide a brief explanation for your choice
+
+        Your response should follow this exact format:
+        category: [selected category]
+        reason: [your brief explanation]
+
+        Do not add any other text to your response.`
     );
+
     // Add this check
     if (categories.length === 0) {
         throw new Error('No categories to create a schema');
     }
 
     const classificationSchema = z.object({
-        category: z.enum([...categories] as [string, ...string[]]).describe("Best matching category of the youtube video. Try to pick the most relevant one if there are multiple contenders. Dont guess a random one!"),
-        reson: z.string().describe("Describe why you picked this category. Use the text from the video to support your answer."),
+        category: z.enum([...categories] as [string, ...string[]]).describe("Pick the single most appropriate category from the list that best matches the YouTube video content."),
+        reason: z.string().describe("Provide a brief explanation (1-2 sentences) for your category selection.")
     });
 
-    // TODO: add a posibliity to use ollama for cheeper running costs OR use other model than gpt-4o
     let llm;
     if (!isOllama) {
         llm = new ChatOpenAI({
-            // temperature: 0,
             modelName: "gpt-4o-mini",
         });
     } else {
-        // TODO: make the model selectable in the .env
+        // get the model from the env
+        const model = process.env.OLLAMA_MODEL || "phi4";
         llm = new ChatOllama({
-            model: "phi4",
+            model: model,
             temperature: 0,
         });
     }

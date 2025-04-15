@@ -171,3 +171,78 @@ export async function getPlaylists(maxResults: number = 25) {
     throw error;
   }
 }
+
+/**
+ * Get the "Watch Later" playlist ID for the authenticated user
+ * @returns The Watch Later playlist ID or null if not found
+ */
+export async function getWatchLaterPlaylistId(): Promise<string | null> {
+  // 💭Yeah this does not seem to be possible. Google does not want us to access this.
+  try {
+    const response = await youtube.playlists.list({
+      part: ['snippet', 'contentDetails'],
+      mine: true,
+      maxResults: 50,
+    });
+
+    const watchLaterPlaylist = response.data.items?.find(
+      playlist => playlist.snippet?.title === 'Watch later'
+    );
+    
+    return watchLaterPlaylist?.id || null;
+  } catch (error) {
+    console.error('Error retrieving Watch Later playlist:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get all videos from the Watch Later playlist
+ * 🛑 Not working
+ * @returns Array of videos in the Watch Later playlist
+ */
+export async function getWatchLaterVideos(): Promise<any[]> {
+  try {
+    // const watchLaterPlaylistId = await getWatchLaterPlaylistId();
+    const watchLaterPlaylistId = 'WL';
+    
+    if (!watchLaterPlaylistId) {
+      throw new Error('Watch Later playlist not found');
+    }
+    
+    const videos: any[] = [];
+    let pageToken: string | undefined;
+    
+    do {
+      const response = await youtube.playlistItems.list({
+        part: ['snippet', 'contentDetails'],
+        playlistId: watchLaterPlaylistId,
+        maxResults: 50,
+        pageToken: pageToken,
+      });
+      
+      if (response.data.items) {
+        const formattedVideos = response.data.items.map(item => ({
+          title: item.snippet?.title || '',
+          link: `https://www.youtube.com/watch?v=${item.contentDetails?.videoId}`,
+          id: item.contentDetails?.videoId || '',
+          channelName: item.snippet?.channelTitle || '',
+          // Note: view count and publish date require additional API calls
+          numberOfView: '',
+          whenWasItPosted: '',
+        }));
+        
+        videos.push(...formattedVideos);
+      }
+      
+      pageToken = response.data.nextPageToken;
+    } while (pageToken);
+    
+    return videos;
+  } catch (error) {
+    console.error('Error retrieving Watch Later videos:', error);
+    throw error;
+  }
+}
+
+// ...existing code...

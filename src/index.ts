@@ -3,6 +3,7 @@ import { createCategories } from "./service/createCategories";
 import { renderCategories } from "./service/renderCategories";
 import { createPlaylistsForCategories } from "./service/createPlaylists";
 import { readFileSync } from "fs";
+import { getWatchLaterPlaylistId, getWatchLaterVideos } from "./service/playListManagement";
 
 dotenv.config();
 
@@ -20,12 +21,13 @@ async function main() {
       console.error("Please provide a path to the watchlist file.");
       process.exit(1);
     }
-
+    // categorise the watchlist
     // Check if the --ollama flag is passed
     const isOllama = process.argv.includes("--ollama");
-    console.log(isOllama ? "Using Ollama" : "Using gpt-4");
+    console.log(isOllama ? "Using Ollama" : "Using OpenAI");
     categorizedList = await createCategories(categoryListPath, watchlistPath, isOllama);
   } else {
+    // If --render is passed, read the categorized list from a file
     const categorizedListPath = process.argv[2];
     if (!categorizedListPath) {
       console.error("Please provide a path to the categorized list file.");
@@ -33,13 +35,16 @@ async function main() {
     }
     categorizedList = JSON.parse(readFileSync(categorizedListPath, "utf-8"));
     watchlistPath = categorizedListPath;
+
   }
 
+  // create the markdown file
   const fileName = watchlistPath.split("/").pop().replace(".json", ".md");
   renderCategories(categorizedList, fileName);
 
   const isYoutubePlaylist = process.argv.includes("--youtubePlaylist");
   if (isYoutubePlaylist) {
+    // if --youtubePlaylist is passed, create the youtube playlists
     await createPlaylistsForCategories(categorizedList);
   }
 
