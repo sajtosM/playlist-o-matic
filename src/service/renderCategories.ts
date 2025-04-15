@@ -14,7 +14,7 @@ export async function renderCategories(watchlist: any, fileName?: string) {
         fileContent += "| Title | Url |\n";
         fileContent += "| --- | --- |\n";
         for (const video of element) {
-            fileContent += `| [${video.title.replaceAll('|', '')}](${video.link}) | ${video.link} |\n`;
+            fileContent += `| [${video.title.replaceAll('|', '')}](${video.link}) by ${video.channelName} | ${video.link} |\n`;
         }
     }
     if (fileName) {

@@ -5,6 +5,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import * as dotenv from 'dotenv';
 import { ChatOllama } from "@langchain/ollama";
 import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { addChannelList, SavedChannel } from "./channelList";
 
 dotenv.config();
 
@@ -130,10 +131,13 @@ export async function createCategories(categoryListPath: string, watchlistPath: 
 
     const results = [];
 
+    // channelnames
+    const channelList: SavedChannel[] = await addChannelList();
 
     for (const video of watchlist) {
         try {
-            const input = `${video.title} by ${video.channelName}`;
+            const channelCategory = channelList.find(x => x.channelName === video.channelName)?.category;
+            const input = `${video.title} by ${video.channelName}` + (channelCategory ? ` (Channel in category: ${channelCategory})` : '');
             console.log(input);
             const result: any = await taggingChain.invoke({ input });
             console.log(result);

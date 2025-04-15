@@ -60,7 +60,23 @@ console.log(
 
 Save the output as `data/WL.json`.
 
-### 2. Define Categories
+### 2. Pre-categorize Channels (Optional)
+
+You can pre-categorize YouTube channels to automatically assign categories to videos from specific channels without AI analysis:
+
+1. The first time you run the tool with your watchlist, it will automatically generate a `data/channelList.csv` file containing all channels in your watchlist
+2. Edit this CSV file to add category assignments in the format: `ChannelName;Category;`
+3. Example:
+   ```
+   channelName;category
+   TechReviews;Technology
+   CookingWithChef;Cooking
+   GamingDaily;🎮Gaming
+   ```
+4. When processing videos, if a channel has a pre-assigned category in the CSV file, that category will be used instead of AI categorization
+5. This is especially useful for channels that consistently produce content in the same category
+
+### 3. Define Categories
 
 Create a file named `data/categoryList.txt` with your desired categories:
 
@@ -71,7 +87,7 @@ Create a file named `data/categoryList.txt` with your desired categories:
 📚Education
 ```
 
-### 3. Generate Categorized Playlists
+### 4. Generate Categorized Playlists
 
 ```sh
 # Basic categorization
@@ -87,7 +103,7 @@ ts-node src/index.ts data/categoryList.txt data/WL.json --youtubePlaylist
 ts-node src/index.ts data/categoryList.txt data/WL.json --ollama --youtubePlaylist
 ```
 
-### 4. Render Existing Categorized Lists
+### 5. Render Existing Categorized Lists
 
 If you already have a categorized list JSON file, you can render it to markdown without re-categorizing:
 
@@ -95,7 +111,7 @@ If you already have a categorized list JSON file, you can render it to markdown 
 ts-node src/index.ts data/watchlistCategory.json --render
 ```
 
-### 5. YouTube Authentication
+### 6. YouTube Authentication
 
 To use the YouTube API for creating playlists, you'll need to authenticate:
 
