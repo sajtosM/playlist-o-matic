@@ -4,7 +4,7 @@ A tool for automatically categorizing YouTube videos from your watchlist into pl
 
 ## Features
 
-- Automatically categorizes YouTube videos based on  content
+- Automatically categorizes YouTube videos based on content
 - Creates organized playlists from your watchlist
 - Renders playlists as markdown files for easy viewing
 - Create YouTube playlists with the categorized videos
@@ -99,6 +99,9 @@ ts-node src/index.ts data/categoryList.txt data/WL.json --ollama
 # Create actual YouTube playlists with the categorized videos
 ts-node src/index.ts data/categoryList.txt data/WL.json --youtubePlaylist
 
+# Create YouTube playlists for a specific category only
+ts-node src/index.ts data/categoryList.txt data/WL.json --youtubePlaylist --category music
+
 # Combine flags as needed
 ts-node src/index.ts data/categoryList.txt data/WL.json --ollama --youtubePlaylist
 ```
@@ -108,7 +111,13 @@ ts-node src/index.ts data/categoryList.txt data/WL.json --ollama --youtubePlayli
 If you already have a categorized list JSON file, you can render it to markdown without re-categorizing:
 
 ```sh
-ts-node src/index.ts data/watchlistCategory.json --render
+ts-node src/index.ts --render data/watchlistCategory.json
+
+# You can also create YouTube playlists from a previously categorized list
+ts-node src/index.ts --render data/watchlistCategory.json --youtubePlaylist
+
+# Or limit playlist creation to a specific category
+ts-node src/index.ts --render data/watchlistCategory.json --youtubePlaylist --category music
 ```
 
 ### 6. YouTube Authentication
@@ -122,11 +131,25 @@ node -e "require('./dist/service/getRefreshToken').getYouTubeRefreshToken()"
 
 This will guide you through the authentication process and save the refresh token to your .env file.
 
-## Command-line Flags
+## Command-line Options
 
-- `--ollama`: Use Ollama instead of OpenAI for AI inference
-- `--render`: Render an existing categorized list JSON to markdown
-- `--youtubePlaylist`: Create actual YouTube playlists for each category
+```
+Usage
+  $ playlist-o-matic [options] <categoryListPath> <watchlistPath>
+
+Options
+  --render, -r             Render categories from a previously categorized list
+  --ollama, -o             Use Ollama instead of OpenAI
+  --youtubePlaylist, -y    Create YouTube playlists for categories
+  --category, -c           Specify a category ID for YouTube playlist creation
+  --help                   Show this help text
+
+Examples
+  $ playlist-o-matic ./data/categories.txt ./data/WL.json
+  $ playlist-o-matic --render ./data/watchlistCategory.json
+  $ playlist-o-matic ./data/categories.txt ./data/WL.json --ollama
+  $ playlist-o-matic --render ./data/watchlistCategory.json --youtubePlaylist --category music
+```
 
 ## Known Issues
 
