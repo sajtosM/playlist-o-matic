@@ -28,6 +28,7 @@
     "googleapis": "^118.0.0",
     "jest": "^29.7.0",
     "langchain": "^0.3.19",
+    "meow": "^13.2.0",
     "npm-run-all": "^4.1.5",
     "rimraf": "^5.0.5",
     "ts-jest": "^29.2.6",

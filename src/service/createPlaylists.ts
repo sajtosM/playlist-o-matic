@@ -4,12 +4,17 @@ import { createCategoryList } from "./renderCategories";
 /**
  * Creates playlists for each category in the watchlist and adds videos to the playlists.
  */
-export const createPlaylistsForCategories = async (watchlist: any) => {
+export const createPlaylistsForCategories = async (watchlist: any, categoryId: string) => {
 
     const categoryList = createCategoryList(watchlist);
     console.log('Creating playlists for categories');
     const existingPlaylists = await getPlaylists();
     for (const category in categoryList) {
+        if (categoryId && category !== categoryId) {
+            console.log(`Skipping category "${category}" as it does not match the provided category ID "${categoryId}"`);
+            continue;
+        }
+
         // check if playlist already exists
         const prefix = process.env.YOUTUBE_PLAYLIST_PREFIX || '';
         if (existingPlaylists.some((playlist: any) => playlist.snippet.title === prefix + category)) {

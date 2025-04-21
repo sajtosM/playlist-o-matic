@@ -42,10 +42,16 @@ async function main() {
   const fileName = watchlistPath.split("/").pop().replace(".json", ".md");
   renderCategories(categorizedList, fileName);
 
+  let categoryId;
+  if (process.argv[3] && !process.argv[3].startsWith("--")) {
+  
+    categoryId = process.argv[3];  
+  }
+
   const isYoutubePlaylist = process.argv.includes("--youtubePlaylist");
   if (isYoutubePlaylist) {
     // if --youtubePlaylist is passed, create the youtube playlists
-    await createPlaylistsForCategories(categorizedList);
+    await createPlaylistsForCategories(categorizedList, categoryId);
   }
 
 }
