@@ -2,11 +2,7 @@
   "name": "playlist-o-matic",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "index.js",
-  "bin": {
-    "playlist-o-matic": "./dist/index.js"
-  },
   "scripts": {
     "test": "npm run build && jest",
     "build": "npm-run-all clean tsc",
