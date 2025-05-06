@@ -8,7 +8,6 @@
     "build": "npm-run-all clean tsc",
     "tsc": "tsc",
     "clean": "rimraf dist/*",
-    "render-categories": "ts-node src/renderCatFile.ts",
     "start": "ts-node src/index.ts"
   },
   "author": "",
