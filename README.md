@@ -21,7 +21,7 @@ npm install
 Create a `.env` file with your OpenAI API key and YouTube API credentials:
 
 ```sh
-OPENAI_API_KEY="your-openai-api-key" # Optional: Use OpenAI for AI inference
+OPENAI_API_KEY="your-openai-api-key" # Default: Use OpenAI for AI inference
 OLLAMA_MODEL="gemma3:12b" # Optional: Use Ollama for local inference
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
