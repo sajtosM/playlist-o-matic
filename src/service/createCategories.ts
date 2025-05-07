@@ -99,7 +99,8 @@ export async function createCategories(categoryListPath: string, watchlistPath: 
 
     const classificationSchema = z.object({
         category: z.enum([...categories] as [string, ...string[]]).describe("Pick the single most appropriate category from the list that best matches the YouTube video content."),
-        reason: z.string().describe("Provide a brief explanation (1-2 sentences) for your category selection.")
+        reason: z.string().describe("Provide a brief explanation (1-2 sentences) for your category selection."),
+        rating: z.number().optional().describe("Optional: Rate the video on a scale of 0-100% based on it being a good fit for the category."),
     });
 
     let llm;
@@ -134,22 +135,47 @@ export async function createCategories(categoryListPath: string, watchlistPath: 
     // channelnames
     const channelList: SavedChannel[] = await addChannelList();
 
+    // get the data/watchlistCategory.json file if it exists and parse it
+    let existingData = [];
+    try {
+        existingData = JSON.parse(readFileSync("data/watchlistCategory.json", "utf-8"));
+    } catch (error) {
+        console.log("data/watchlistCategory.json not found");
+    }
+
     for (const video of watchlist) {
         try {
             const channelCategory = channelList.find(x => x.channelName === video.channelName)?.category;
             const input = `${video.title} by ${video.channelName}` + (channelCategory ? ` (Channel in category: ${channelCategory})` : '');
             console.log(input);
-            const result: any = await taggingChain.invoke({ input });
+
+            let result: any;
+            const cleanId = video.id.split('&')[0];
+            // if the video is already in the existing data, skip it
+            if (existingData.some((x: any) => x.id.includes(cleanId))) {
+                console.log(`Video ${video.title} already categorized, skipping...`);
+                const existingVideo = existingData.find((x: any) => x.id.includes(cleanId));
+                result = {
+                    ...existingVideo,
+                    title: video.title,
+                    link: video.link,
+                    id: video.id,
+                }
+                results.push(result);
+            } else {
+                result = await taggingChain.invoke({ input });
+                results.push({
+                    title: video.title,
+                    link: video.link,
+                    category: result.category,
+                    id: video.id,
+                    language: result.language,
+                    channelName: video.channelName,
+                    numberOfViews: video.numberOfViews,
+                })
+            }
             console.log(result);
-            results.push({
-                title: video.title,
-                link: video.link,
-                category: result.category,
-                id: video.id,
-                language: result.language,
-                channelName: video.channelName,
-                numberOfViews: video.numberOfViews,
-            })
+
         } catch (error) {
             console.error("Error processing video:", video.title, error);
         }
