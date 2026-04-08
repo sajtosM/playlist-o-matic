@@ -44,5 +44,8 @@
     "@types/xml2js": "^0.4.14",
     "globals": "^15.7.0",
     "typescript-eslint": "^7.14.1"
+  },
+  "overrides": {
+    "buffer-equal-constant-time": "file:./shims/buffer-equal-constant-time"
   }
 }

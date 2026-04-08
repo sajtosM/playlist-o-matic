@@ -1,0 +1,6 @@
+{
+  "name": "buffer-equal-constant-time",
+  "version": "1.0.2-node22-patch",
+  "description": "Shim for Node.js 22+ compatibility (SlowBuffer removed)",
+  "main": "index.js"
+}
