@@ -20,7 +20,8 @@
   1. `package.json` lists `ai`, `@ai-sdk/openai`, `@ai-sdk/ollama` and has no LangChain packages (`langchain`, `@langchain/core`, `@langchain/openai`, `@langchain/ollama`)
   2. `package.json` has no entries for `youtubei.js`, `meow`, `compromise`, or `camelcase`
   3. `npm install` completes without errors and `node_modules` reflects the new dependency set
-**Plans**: TBD
+**Plans**: 1 plan
+- [ ] 01-01-PLAN.md — Swap packages in package.json, update tsconfig.json moduleResolution, run npm install
 
 ### Phase 2: Categorization Rewrite
 **Goal**: `createCategories.ts` categorizes videos using Vercel AI SDK `generateObject()` for both OpenAI and Ollama backends with all existing behavior preserved
